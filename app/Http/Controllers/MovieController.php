@@ -15,7 +15,8 @@ class MovieController extends Controller
     public function index()
     {
       $movies = Movie::all();
-      dd($movies);
+
+      return view('movies', compact('movies'));
 
     }
 
@@ -46,9 +47,9 @@ class MovieController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function show($id)
+    public function show(Movie $movie)
     {
-        //
+      return view('movies.show', compact("movie"));
     }
 
     /**
