@@ -47,9 +47,16 @@ class MovieController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function show(Movie $movie)
+    public function show($id)
     {
-      return view('movies.show', compact("movie"));
+      // $movies = Movie::where('id', $id)->get();
+      $movie = Movie::find($id);
+
+      if(empty($movie)) {
+        abort(404);
+      }
+
+      return view('show', compact('movie'));
     }
 
     /**
