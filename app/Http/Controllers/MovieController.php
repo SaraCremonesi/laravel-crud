@@ -27,7 +27,7 @@ class MovieController extends Controller
      */
     public function create()
     {
-        //
+      return view('movies.create');
     }
 
     /**
@@ -38,7 +38,25 @@ class MovieController extends Controller
      */
     public function store(Request $request)
     {
-        //
+      $request->validate([
+        'title' => 'required|max:255',
+        'year' => 'required|integer|min:1895|max:2020',
+        'description' => 'required',
+        'rating' => 'required|integer|min:0|max:10'
+      ]);
+
+      $request_data = $request->all();
+
+      $new_movie = new Movie();
+
+      $new_movie->fill($request_data);
+
+      $saved = $new_movie->save();
+
+      if ($saved) {
+        $saved_movie = Movie::orderBy('id', 'desc')->first();
+        return redirect()->route('movies.show', $saved_movie);
+      }
     }
 
     /**
@@ -47,16 +65,9 @@ class MovieController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function show($id)
+    public function show(Movie $movie)
     {
-      // $movies = Movie::where('id', $id)->get();
-      $movie = Movie::find($id);
-
-      if(empty($movie)) {
-        abort(404);
-      }
-
-      return view('show', compact('movie'));
+      return view('movies.show', compact('movie'));
     }
 
     /**
@@ -65,9 +76,9 @@ class MovieController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function edit($id)
+    public function edit(Movie $movie)
     {
-        //
+      return view('movies.edit', compact('movie'));
     }
 
     /**
@@ -77,9 +88,14 @@ class MovieController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function update(Request $request, Movie $movie)
     {
-        //
+      $request->validate($this->getValidation());
+
+      $data = $request->all();
+      $movie->update($data);
+
+      return redirect()->route('movies.show', $movie);
     }
 
     /**
@@ -88,8 +104,18 @@ class MovieController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id)
+    public function destroy(Movie $movie)
     {
-        //
+      $movie->delete();
+      return redirect()->route('movies.index');
     }
+
+      protected function getValidation() {
+        return [
+          'title' => 'required|max:255',
+          'year' => 'required|integer|min:1895|max:2020',
+          'description' => 'required',
+          'rating' => 'required|integer|min:0|max:10'
+        ];
+      }
 }
